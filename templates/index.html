@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            font-size: 16px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #translated-text {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            line-height: 1.5;
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Translation App</h1>
+        <form id="translation-form">
+            <label for="input-text">Enter text to translate:</label>
+            <textarea id="input-text" name="input-text" placeholder="Enter text..." required></textarea>
+            
+            <label for="source-language">Source Language:</label>
+            <select id="source-language" name="source-language">
+                <option value="en">English</option>
+                <option value="vi">Vietnamese</option>
+            </select>
+            
+            <label for="target-language">Target Language:</label>
+            <select id="target-language" name="target-language">
+                <option value="vi">Vietnamese</option>
+                <option value="en">English</option>
+            </select>
+            
+            <button type="button" onclick="translateText()">Translate</button>
+        </form>
+        
+        <div id="translation-result">
+            <div id="translated-text">
+                <!-- Translated text will be displayed here -->
+            </div>
+            <button type="button" onclick="copyTranslatedText()">Copy Text</button>
+        </div>
+    </div>
+
+    <script>
+        function translateText() {
+            var inputText = document.getElementById("input-text").value;
+            var srcLang = document.getElementById("source-language").value;
+            var tgtLang = document.getElementById("target-language").value;
+
+            fetch("/translate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    text: inputText,
+                    src_lang: srcLang,
+                    tgt_lang: tgtLang
+                })
+            })
+            .then(response => response.text())
+            .then(translatedText => {
+                document.getElementById("translated-text").innerText = translatedText;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+
+        }
+
+        function copyTranslatedText() {
+            var translatedText = document.getElementById("translated-text").innerText;
+            navigator.clipboard.writeText(translatedText)
+                .then(() => {
+                    alert("Copied to clipboard!");
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to copy text!");
+            });
+        }
+    </script>
+</body>
+</html>
